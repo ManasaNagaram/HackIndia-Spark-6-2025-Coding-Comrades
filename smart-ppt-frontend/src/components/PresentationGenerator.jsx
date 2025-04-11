@@ -147,10 +147,10 @@ export default function PresentationGenerator() {
                   onChange={(e) => setFont(e.target.value)}
                   className="w-full border border-gray-300 rounded-md px-4 py-2"
                 >
+                  <option value="Comic Sans MS">Comic Sans MS</option>
                   <option value="Calibri">Calibri</option>
                   <option value="Arial">Arial</option>
-                  <option value="Times New Roman">Times New Roman</option>
-                  <option value="Comic Sans MS">Comic Sans MS</option>
+                  <option value="Times New Roman">Times New Roman</option>      
                   <option value="Georgia">Georgia</option>
                 </select>
               </div>
@@ -162,8 +162,8 @@ export default function PresentationGenerator() {
                   onChange={(e) => setTheme(e.target.value)}
                   className="w-full border border-gray-300 rounded-md px-4 py-2"
                 >
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
+                  <option value="light">Dark</option>
+                  <option value="dark">Light</option>
                 </select>
               </div>
             </div>
