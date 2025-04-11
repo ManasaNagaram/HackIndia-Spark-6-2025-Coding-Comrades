@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import AOS from 'aos';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import 'aos/dist/aos.css';
 
 export default function PresentationGenerator() {
@@ -8,22 +10,33 @@ export default function PresentationGenerator() {
   const [loading, setLoading] = useState(false);
   const [pptUrl, setPptUrl] = useState('');
 
+  const { token, isLoggedIn } = useAuth();
+
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
 
   const handleGenerate = async () => {
+    if (!isLoggedIn) {
+      alert('Please login to generate a presentation.');
+      return;
+    }
+
     setLoading(true);
     setPptUrl('');
     try {
-      const response = await fetch('/ppt/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, slideCount }),
-      });
+      const response = await axios.post(
+        'http://localhost:3000/ppt/generate',
+        { topic, slideCount },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          responseType: 'blob',
+        }
+      );
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const url = window.URL.createObjectURL(new Blob([response.data]));
       setPptUrl(url);
     } catch (error) {
       console.error(error);
@@ -47,6 +60,14 @@ export default function PresentationGenerator() {
       a.click();
     }
   };
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center text-white text-xl">
+        Please log in to access the Smart Presentation Generator.
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center p-6 text-white font-sans">

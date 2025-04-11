@@ -1,11 +1,21 @@
 import './index.css';
 import PresentationGenerator from './components/PresentationGenerator';
-import SlideForm from '../../../client/client/src/components/SlideForm';
+import LoginForm from './components/LoginForm';
+import { BrowserRouter as Router, Routes, Route } from 'react-router';
+import SignupForm from './components/SignupForm';
+
+
 
 function App() {
   return (
     <div className="min-h-screen bg-gray-100">
-      <PresentationGenerator />
+      <Router>
+      <Routes>
+      <Route path="/" element={<PresentationGenerator />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/signup" element={<SignupForm />} />
+      </Routes>
+    </Router>
       
     </div>
   );

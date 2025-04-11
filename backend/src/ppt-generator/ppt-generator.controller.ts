@@ -40,7 +40,7 @@ export class PptGeneratorController {
           message: 'AI generated no valid content.',
         });
       }
-      console.log(slides);
+      
       // Generate PowerPoint file using updated pptx-genjs
       const pptBuffer = await this.pptGeneratorService.generatePpt(slides);
 
