@@ -1,6 +1,17 @@
-import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { MistralService } from 'src/mistral/mistral.service';
 import { PptGeneratorService } from './ppt-generator.service';
+import { Response } from 'express';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Controller('ppt')
 export class PptGeneratorController {
@@ -12,25 +23,22 @@ export class PptGeneratorController {
   @Post('generate')
   async generatePpt(
     @Body() body: { topic: string; slideCount: number },
-    @Res() res,
+    @Res() res: Response,
   ) {
     try {
       const { topic, slideCount } = body;
 
       if (!topic || !slideCount || slideCount <= 0) {
         return res.status(HttpStatus.BAD_REQUEST).json({
-          message:
-            'Invalid input. Please provide a valid topic and slide count.',
+          message: 'Invalid input. Please provide a valid topic and slide count.',
         });
       }
 
-      // Generate slide content using MistralAI
       const slideContent = await this.mistralService.generateSlideContent(
         topic,
         slideCount,
       );
 
-      // Split slides properly (trim to avoid empty strings)
       const slides = slideContent
         .map((slide) => slide.trim())
         .filter((slide) => slide.length > 0);
@@ -40,18 +48,17 @@ export class PptGeneratorController {
           message: 'AI generated no valid content.',
         });
       }
-      
-      // Generate PowerPoint file using updated pptx-genjs
-      const pptBuffer = await this.pptGeneratorService.generatePpt(slides);
 
-      // Send the file as a downloadable response
-      res.set({
-        'Content-Type':
-          'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'Content-Disposition': `attachment; filename="generatedPPT.pptx"`,
+      const { filename, pdfFilename } = await this.pptGeneratorService.generatePpt(slides);
+      const base = process.env.BASE_URL || 'http://localhost:3000';
+      const downloadUrl = `${base}/ppt/download/${filename}`;
+      const previewUrl = `${base}/ppt/preview/${pdfFilename}`;
+
+      return res.status(HttpStatus.OK).json({
+        message: 'Presentation generated successfully.',
+        downloadUrl,
+        previewUrl,
       });
-
-      return res.status(HttpStatus.OK).send(pptBuffer);
     } catch (error) {
       console.error('Error generating PowerPoint:', error);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -59,5 +66,25 @@ export class PptGeneratorController {
         error: error.message,
       });
     }
+  }
+
+  @Get('download/:filename')
+  async downloadFile(@Param('filename') filename: string, @Res() res: Response) {
+    const filePath = path.join(__dirname, '../../temp', filename);
+    if (!fs.existsSync(filePath)) {
+      return res.status(HttpStatus.NOT_FOUND).json({ message: 'File not found.' });
+    }
+    return res.download(filePath);
+  }
+
+  @Get('preview/:filename')
+  async previewFile(@Param('filename') filename: string, @Res() res: Response) {
+    const filePath = path.join(__dirname, '../../temp', filename);
+    if (!fs.existsSync(filePath)) {
+      return res.status(HttpStatus.NOT_FOUND).json({ message: 'File not found.' });
+    }
+    res.setHeader('Content-Type', 'application/pdf');
+    const stream = fs.createReadStream(filePath);
+    stream.pipe(res);
   }
 }

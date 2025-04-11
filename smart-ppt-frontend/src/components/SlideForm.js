@@ -11,7 +11,7 @@ const SlideForm = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/generate', {
+      const response = await axios.post('http://localhost:3000/generate', {
         title,
         content
       }, {

@@ -8,7 +8,7 @@ export default function PresentationGenerator() {
   const [topic, setTopic] = useState('');
   const [slideCount, setSlideCount] = useState(5);
   const [loading, setLoading] = useState(false);
-  const [pptUrl, setPptUrl] = useState('');
+  const [pptUrl, setPptUrl] = useState(null);
 
   const { token, isLoggedIn } = useAuth();
 
@@ -23,7 +23,8 @@ export default function PresentationGenerator() {
     }
 
     setLoading(true);
-    setPptUrl('');
+    setPptUrl(null);
+
     try {
       const response = await axios.post(
         'http://localhost:3000/ppt/generate',
@@ -32,12 +33,11 @@ export default function PresentationGenerator() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          responseType: 'blob',
         }
       );
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      setPptUrl(url);
+      const { downloadUrl, previewUrl } = response.data;
+      setPptUrl({ downloadUrl, previewUrl });
     } catch (error) {
       console.error(error);
       alert('Failed to generate presentation.');
@@ -47,15 +47,15 @@ export default function PresentationGenerator() {
   };
 
   const handlePreview = () => {
-    if (pptUrl) {
-      window.open(pptUrl, '_blank');
+    if (pptUrl?.previewUrl) {
+      window.open(pptUrl.previewUrl, '_blank');
     }
   };
 
   const handleDownload = () => {
-    if (pptUrl) {
+    if (pptUrl?.downloadUrl) {
       const a = document.createElement('a');
-      a.href = pptUrl;
+      a.href = pptUrl.downloadUrl;
       a.download = 'presentation.pptx';
       a.click();
     }
@@ -131,20 +131,28 @@ export default function PresentationGenerator() {
             </button>
 
             {pptUrl && (
-              <div className="flex justify-between mt-4 gap-4">
-                <button
-                  onClick={handlePreview}
-                  className="w-1/2 py-2 border border-indigo-600 text-indigo-600 font-medium rounded-lg hover:bg-indigo-50 transition"
-                >
-                  Preview
-                </button>
-                <button
-                  onClick={handleDownload}
-                  className="w-1/2 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition"
-                >
-                  Download
-                </button>
-              </div>
+              <>
+                <div className="flex justify-between mt-4 gap-4">
+                 
+                  <button
+                    onClick={handleDownload}
+                    className="w-1/2 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-blue-500 transition"
+                  >
+                    Download
+                  </button>
+                </div>
+
+                <div className="mt-6">
+                  <h2 className="text-lg font-semibold mb-2 text-indigo-700">Preview</h2>
+                  <iframe
+                    src={pptUrl.previewUrl}
+                    title="PDF Preview"
+                    width="100%"
+                    height="500px"
+                    className="border rounded-lg shadow-lg"
+                  />
+                </div>
+              </>
             )}
           </div>
         </div>
