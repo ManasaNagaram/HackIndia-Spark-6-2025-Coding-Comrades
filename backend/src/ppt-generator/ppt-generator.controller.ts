@@ -7,11 +7,12 @@ import {
   Post,
   Res,
 } from '@nestjs/common';
-import { MistralService } from 'src/mistral/mistral.service';
-import { PptGeneratorService } from './ppt-generator.service';
 import { Response } from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
+
+import { MistralService } from 'src/mistral/mistral.service';
+import { PptGeneratorService } from './ppt-generator.service';
 
 @Controller('ppt')
 export class PptGeneratorController {
@@ -22,11 +23,17 @@ export class PptGeneratorController {
 
   @Post('generate')
   async generatePpt(
-    @Body() body: { topic: string; slideCount: number },
+    @Body()
+    body: {
+      topic: string;
+      slideCount: number;
+      theme?: 'light' | 'dark';
+      font?: string;
+    },
     @Res() res: Response,
   ) {
     try {
-      const { topic, slideCount } = body;
+      const { topic, slideCount, theme = 'dark', font = 'Comic Sans MS' } = body;
 
       if (!topic || !slideCount || slideCount <= 0) {
         return res.status(HttpStatus.BAD_REQUEST).json({
@@ -39,17 +46,23 @@ export class PptGeneratorController {
         slideCount,
       );
 
-      const slides = slideContent
+      const slidesText = slideContent
         .map((slide) => slide.trim())
-        .filter((slide) => slide.length > 0);
+        .filter((slide) => slide.length > 0)
+        .join('\n\n'); // Join to form a single string for parsing
 
-      if (slides.length === 0) {
+      if (!slidesText) {
         return res.status(HttpStatus.NO_CONTENT).json({
           message: 'AI generated no valid content.',
         });
       }
 
-      const { filename, pdfFilename } = await this.pptGeneratorService.generatePpt(slides);
+      const { filename, pdfFilename } = await this.pptGeneratorService.generatePpt(
+        slidesText,
+        theme,
+        font,
+      );
+
       const base = process.env.BASE_URL || 'http://localhost:3000';
       const downloadUrl = `${base}/ppt/download/${filename}`;
       const previewUrl = `${base}/ppt/preview/${pdfFilename}`;

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { HttpModule } from '@nestjs/axios'; // ✅ Add this for HTTP requests
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -23,6 +24,7 @@ import { UsersModule } from './users/user.module'; // If you have user logic sep
       }),
       inject: [ConfigService],
     }),
+    HttpModule, // ✅ Required for UnsplashService
     PptGeneratorModule,
     MistralModule,
     AuthModule,
