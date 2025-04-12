@@ -1,0 +1,177 @@
+/* General Reset */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+  }
+  
+  .login-wrapper {
+    position: relative;
+    height: 100vh;
+    background: linear-gradient(135deg, #a5b4fc, #c4b5fd);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeInBg 1s ease-in-out;
+    overflow: hidden;
+  }
+  
+  /* Fade in on load */
+  @keyframes fadeInBg {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  /* Form Animation */
+  @keyframes slideUp {
+    from {
+      transform: translateY(40px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .login-form {
+    animation: slideUp 0.8s ease-out forwards;
+    max-width: 400px;
+    width: 100%;
+    padding: 30px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    z-index: 10;
+  }
+  
+  .login-form h2 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #4f46e5;
+    margin-bottom: 20px;
+  }
+  
+  .login-form input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: 0.3s;
+  }
+  
+  .login-form input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+  }
+  
+  .login-form button {
+    width: 100%;
+    background-color: #6366f1;
+    color: white;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .login-form button:hover {
+    background-color: #4f46e5;
+    transform: scale(1.03);
+  }
+  
+  /* Animated Background Circles */
+  .circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    animation: floatCircle 10s linear infinite;
+  }
+  
+  .circle:nth-child(1) {
+    width: 200px;
+    height: 200px;
+    top: -50px;
+    left: -50px;
+  }
+  
+  .circle:nth-child(2) {
+    width: 150px;
+    height: 150px;
+    bottom: 100px;
+    right: 30px;
+    animation-delay: 2s;
+  }
+  
+  .circle:nth-child(3) {
+    width: 100px;
+    height: 100px;
+    top: 60%;
+    left: 10%;
+    animation-delay: 4s;
+  }
+  
+  @keyframes floatCircle {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-20px) rotate(180deg);
+    }
+    100% {
+      transform: translateY(0) rotate(360deg);
+    }
+  }
+  .login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    z-index: 10;
+    flex-wrap: wrap;
+  }
+  
+  .login-image img {
+    width: 400px;
+    opacity: 0.75;
+    animation: floatImg 6s ease-in-out infinite, fadeInImg 1.5s ease forwards;
+    filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.3));
+    transition: transform 0.4s ease;
+  }
+  
+  .login-image img:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Floating animation */
+  @keyframes floatImg {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  /* Fade-in animation */
+  @keyframes fadeInImg {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 0.75;
+      transform: scale(1);
+    }
+  }
+  

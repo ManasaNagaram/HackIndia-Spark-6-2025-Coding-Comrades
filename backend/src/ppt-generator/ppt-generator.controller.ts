@@ -81,6 +81,34 @@ export class PptGeneratorController {
     }
   }
 
+  @Post('script')
+  async generateScript(
+    @Body() body: { topic: string; slideCount: number },
+    @Res() res: Response,
+  ) {
+    try {
+      const { topic, slideCount } = body;
+
+      if (!topic || !slideCount || slideCount <= 0) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          message: 'Invalid input. Please provide a valid topic and slide count.',
+        });
+      }
+
+      const slideContent = await this.mistralService.generateSlideContent(topic, slideCount);
+      const scriptLines = await this.mistralService.generatePresentationScript(slideContent);
+
+      return res.status(HttpStatus.OK).json({ scriptLines });
+    } catch (error) {
+      console.error('Error generating script:', error);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'Failed to generate speaker script.',
+        error: error.message,
+      });
+    }
+  }
+
+
   @Get('download/:filename')
   async downloadFile(@Param('filename') filename: string, @Res() res: Response) {
     const filePath = path.join(__dirname, '../../temp', filename);
